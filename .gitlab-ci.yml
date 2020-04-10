@@ -12,7 +12,7 @@ testing:
   stage: test
   before_script:
     - apk add -U pwgen python3 jq
-    - pip install awscli
+    - pip3 install awscli
     - export TF_VAR_prefix=$(pwgen -AB 8 1)
     - cd .ci
     - terraform init
