@@ -1,0 +1,25 @@
+default:
+  image:
+    name: hashicorp/terraform:light
+    entrypoint: [""]
+  tags:
+    - schism-testing
+
+stages:
+  - test
+
+testing:
+  stage: test
+  before_script:
+    - apk add -U pwgen python3 jq
+    - pip install awscli
+    - export TF_VAR_prefix=$(pwgen -AB 8 1)
+    - cd .ci
+    - terraform init
+    - terraform plan -var-file=${TF_GITLAB_CI_VAR_FILE} -out tf.plan
+  script:
+    - terraform apply tf.plan
+    - aws lambda invoke --function "${TF_VAR_prefix}-controller" --log-type Tail --payload '{}' result.json
+    - jq . result.json
+    - aws ssm describe-parameters --parameter-filters "Key=Name,Option=Contains,Values='${TF_VAR_prefix}-'"
+    - terraform destroy -var-file=${TF_GITLAB_CI_VAR_FILE} -force
