@@ -23,4 +23,6 @@ testing:
     - aws lambda invoke --function "${TF_VAR_prefix}-controller" --log-type Tail --payload '{}' result.json
     - jq . result.json
     - aws ssm describe-parameters --parameter-filters "Key=Name,Option=Contains,Values='${TF_VAR_prefix}-'"
+    - to_delete=$(aws ssm describe-parameters --parameter-filters "Key=Name,Option=Contains,Values='${TF_VAR_prefix}-'" --query "Parameters[*].Name" --output text)
+    - aws ssm delete-parameters --names ${to_delete}
     - terraform destroy -force
