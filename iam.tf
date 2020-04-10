@@ -23,7 +23,7 @@ resource "aws_iam_policy" "manage_ca_certificates" {
 data "aws_iam_policy_document" "manage_lambda_controller_cloudwatch" {
   dynamic "statement" {
     for_each = {
-      CreateLogGroups : "",
+      CreateLogGroup : "",
       CreateLogStream : ":log-stream:*",
       PutLogEvents : ":log-stream:*"
     }
