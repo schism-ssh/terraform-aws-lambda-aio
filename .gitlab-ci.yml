@@ -13,6 +13,7 @@ testing:
   before_script:
     - apk add -U pwgen python3 jq
     - pip3 install awscli
+    - aws configure set region us-west-2
     - export TF_VAR_prefix=$(pwgen -AB 8 1)
     - cd .ci
     - terraform init
