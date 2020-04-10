@@ -20,6 +20,7 @@ testing:
     - terraform plan -out tf.plan
   script:
     - terraform apply tf.plan
+    - sleep 30
     - aws lambda invoke --function "${TF_VAR_prefix}-controller" --log-type Tail --payload '{}' result.json
     - jq . result.json
     - aws ssm describe-parameters --parameter-filters "Key=Name,Option=Contains,Values='${TF_VAR_prefix}-'"
