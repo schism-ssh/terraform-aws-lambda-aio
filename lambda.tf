@@ -11,7 +11,7 @@ resource "aws_lambda_function" "controller" {
   timeout = var.lambda_function.controller.timeout
 
   environment {
-    variables {
+    variables = {
       SCHISM_CA_KMS_KEY_ID      = var.kms_key.ca_certs.key_id
       SCHISM_HOST_CA_PARAM_NAME = "${var.prefix}-${var.ssm.host_ca_param_name}"
       SCHISM_USER_CA_PARAM_NAME = "${var.prefix}-${var.ssm.user_ca_param_name}"
