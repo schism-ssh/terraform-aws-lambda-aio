@@ -11,19 +11,34 @@ stages:
 testing:
   stage: test
   before_script:
+    - echo -e "section_start:`date +%s`:package_installation\r\e[0KPackage Installaion"
     - apk add -U pwgen python3 jq
     - pip3 install awscli
+    - echo -e "section_end:`date +%s`:package_installation\r\e[0K"
     - aws configure set region us-west-2
     - export TF_VAR_prefix=$(pwgen -AB 8 1)
     - cd .ci
+    - echo -e "section_start:`date +%s`:terraform_setup\r\e[0KTerraform Setup"
     - terraform init
     - terraform plan -out tf.plan
+    - echo -e "section_end:`date +%s`:terraform_setup\r\e[0K"
   script:
+    - echo -e "section_start:`date +%s`:terraform_apply\r\e[0KTerraform Apply"
     - terraform apply tf.plan
-    - sleep 30
+    - echo -e "section_end:`date +%s`:terraform_apply\r\e[0K"
+    - echo -e "section_start:`date +%s`:sleep_hell\r\e[0KSLEEPING IGNORE ME"
+    - sleep 30 # I hate this but testing if the timing plays a role here.
+    - sleep 30 # I hate this but testing if the timing plays a role here.
+    - sleep 30 # I hate this but testing if the timing plays a role here.
+    - sleep 30 # I hate this but testing if the timing plays a role here.
+    - echo -e "section_end:`date +%s`:sleep_hell\r\e[0K"
+    - echo -e "section_start:`date +%s`:lambda_testing\r\e[0KTesting Lambda Invocation"
     - aws lambda invoke --function "${TF_VAR_prefix}-controller" --log-type Tail --payload '{}' result.json
     - jq . result.json
+    - echo -e "section_end:`date +%s`:lambda_testing\r\e[0K"
     - aws ssm describe-parameters --parameter-filters "Key=Name,Option=Contains,Values='${TF_VAR_prefix}-'"
+    - echo -e "section_start:`date +%s`:teardown\r\e[0KTearing Down Test Resources"
     - to_delete=$(aws ssm describe-parameters --parameter-filters "Key=Name,Option=Contains,Values='${TF_VAR_prefix}-'" --query "Parameters[*].Name" --output text)
     - aws ssm delete-parameters --names ${to_delete}
     - terraform destroy -force
+    - echo -e "section_end:`date +%s`:teardown\r\e[0K"
