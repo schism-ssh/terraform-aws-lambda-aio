@@ -2,11 +2,12 @@ variable "prefix" {
   default = "schism-aio"
 }
 
-variable "lambda_s3" {
-  default = {
-    s3_bucket = "your_bucket_here"
-    s3_prefix = "lambdas/schism"
-  }
+variable "lambda_s3_bucket" {
+  default = "your_bucket_here"
+}
+
+variable "lambda_s3_prefix" {
+  default = "lambdas/schism"
 }
 
 variable "lambda_function" {

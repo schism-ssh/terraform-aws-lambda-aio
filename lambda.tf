@@ -1,6 +1,6 @@
 resource "aws_lambda_function" "controller" {
-  s3_bucket = var.lambda_s3.s3_bucket
-  s3_key    = "${var.lambda_s3.s3_prefix}/schism-lambda-${var.lambda_function.controller.version}.zip"
+  s3_bucket = var.lambda_s3_bucket
+  s3_key    = "${var.lambda_s3_prefix}/schism-lambda-${var.lambda_function.controller.version}.zip"
 
   function_name = "${var.prefix}-${var.lambda_function.controller.name}"
   handler       = "schism-lambda-${var.lambda_function.controller.version}"
