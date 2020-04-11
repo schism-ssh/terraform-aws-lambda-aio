@@ -11,7 +11,7 @@ resource "aws_lambda_function" "controller" {
   timeout = var.lambda_function.controller.timeout
 
   depends_on = [
-    aws_iam_role_policy_attachment.controller_certificate_mgmt,
+    aws_iam_role_policy_attachment.controller_certificate_mgmt_ssm,
     aws_iam_role_policy_attachment.controller_cloudwatch_mgmt
   ]
 

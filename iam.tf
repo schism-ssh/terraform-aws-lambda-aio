@@ -1,23 +1,38 @@
-data "aws_iam_policy_document" "manage_ca_certificates" {
+data "aws_iam_policy_document" "manage_ca_certificates_ssm" {
   statement {
-    sid = "ManageCACertificates"
+    sid = "ManageCACertificatesSSM"
     actions = [
-      "kms:Decrypt",
-      "kms:Encrypt",
       "ssm:GetParameter",
       "ssm:PutParameter"
     ]
     resources = [
       "arn:aws:ssm:*:*:parameter/${var.prefix}-${var.ssm.host_ca_param_name}",
-      "arn:aws:ssm:*:*:parameter/${var.prefix}-${var.ssm.user_ca_param_name}",
-      "arn:aws:kms:*:*:key/${var.kms_key.ca_certs.key_id}"
+      "arn:aws:ssm:*:*:parameter/${var.prefix}-${var.ssm.user_ca_param_name}"
     ]
   }
 }
-resource "aws_iam_policy" "manage_ca_certificates" {
-  name = "${var.prefix}-manage-ca-certificates"
+resource "aws_iam_policy" "manage_ca_certificates_ssm" {
+  name = "${var.prefix}-manage-ca-certificates-ssm"
 
-  policy = data.aws_iam_policy_document.manage_ca_certificates.json
+  policy = data.aws_iam_policy_document.manage_ca_certificates_ssm.json
+}
+
+data "aws_iam_policy_document" "manage_ca_certificates_kms" {
+  count = length(var.kms_key.ca_certs.key_id) == 0 ? 0 : 1
+  statement {
+    sid = "ManageCACertificatesKMS"
+    actions = [
+      "kms:Decrypt",
+      "kms:Encrypt"
+    ]
+    resources = ["arn:aws:kms:*:*:key/${var.kms_key.ca_certs.key_id}"]
+  }
+}
+resource "aws_iam_policy" "manage_ca_certificates_kms" {
+  count = length(data.aws_iam_policy_document.manage_ca_certificates_kms)
+  name  = "${var.prefix}-manage-ca-certificates-kms"
+
+  policy = data.aws_iam_policy_document.manage_ca_certificates_kms[count.index].json
 }
 
 data "aws_iam_policy_document" "manage_lambda_controller_cloudwatch" {
@@ -67,9 +82,14 @@ resource "aws_iam_role" "lambda_controller" {
   assume_role_policy = data.aws_iam_policy_document.lambda_controller.json
 }
 
-resource "aws_iam_role_policy_attachment" "controller_certificate_mgmt" {
+resource "aws_iam_role_policy_attachment" "controller_certificate_mgmt_ssm" {
   role       = aws_iam_role.lambda_controller.name
-  policy_arn = aws_iam_policy.manage_ca_certificates.arn
+  policy_arn = aws_iam_policy.manage_ca_certificates_ssm.arn
+}
+resource "aws_iam_role_policy_attachment" "controller_certificate_mgmt_kms" {
+  count      = length(aws_iam_policy.manage_ca_certificates_kms)
+  role       = aws_iam_role.lambda_controller.name
+  policy_arn = aws_iam_policy.manage_ca_certificates_kms[count.index].arn
 }
 resource "aws_iam_role_policy_attachment" "controller_cloudwatch_mgmt" {
   role       = aws_iam_role.lambda_controller.name
