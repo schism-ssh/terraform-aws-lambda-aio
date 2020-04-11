@@ -14,7 +14,7 @@ variable "lambda_function" {
   default = {
     controller = {
       name    = "controller"
-      version = "v0.1.1"
+      version = "v0.2.0"
       timeout = 900
       runtime = "go1.x"
     }
