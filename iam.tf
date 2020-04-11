@@ -47,9 +47,9 @@ data "aws_iam_policy_document" "manage_lambda_controller_cloudwatch" {
       "PutLogEvents"
     ]
     content {
-      sid = "CloudWatchLambda${statement.key}"
+      sid = "CloudWatchLambda${statement.value}"
       actions = [
-        "logs:${statement.key}"
+        "logs:${statement.value}"
       ]
       resources = [
         join(":", [
