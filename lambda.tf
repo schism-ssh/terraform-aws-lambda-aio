@@ -10,6 +10,11 @@ resource "aws_lambda_function" "controller" {
   runtime = var.lambda_function.controller.runtime
   timeout = var.lambda_function.controller.timeout
 
+  depends_on = [
+    aws_iam_role_policy_attachment.controller_certificate_mgmt,
+    aws_iam_role_policy_attachment.controller_cloudwatch_mgmt
+  ]
+
   environment {
     variables = {
       SCHISM_CA_KMS_KEY_ID      = var.kms_key.ca_certs.key_id
