@@ -21,12 +21,16 @@ resource "aws_iam_policy" "manage_ca_certificates" {
 }
 
 data "aws_iam_policy_document" "manage_lambda_controller_cloudwatch" {
+  statement {
+    sid       = "CloudWatchLambdaCreateLogGroup"
+    actions   = ["logs:CreateLogGroup"]
+    resources = ["*"]
+  }
   dynamic "statement" {
-    for_each = {
-      CreateLogGroup : "",
-      CreateLogStream : ":log-stream:*",
-      PutLogEvents : ":log-stream:*"
-    }
+    for_each = [
+      "CreateLogStream",
+      "PutLogEvents"
+    ]
     content {
       sid = "CloudWatchLambda${statement.key}"
       actions = [
@@ -37,7 +41,7 @@ data "aws_iam_policy_document" "manage_lambda_controller_cloudwatch" {
           "arn:aws:logs",
           data.aws_region.current.name,
           data.aws_caller_identity.current.account_id,
-          "log-group:/aws/lambda/${var.prefix}-${var.lambda_function.controller.name}${statement.value}"
+          "log-group:/aws/lambda/${var.prefix}-${var.lambda_function.controller.name}:log-stream:*"
         ])
       ]
     }
