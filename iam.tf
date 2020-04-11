@@ -29,7 +29,7 @@ data "aws_iam_policy_document" "manage_ca_certificates_kms" {
   }
 }
 resource "aws_iam_policy" "manage_ca_certificates_kms" {
-  count = length(data.aws_iam_policy_document.manage_ca_certificates_kms) == 0 ? 0 : 1
+  count = length(var.kms_key.ca_certs.key_id) == 0 ? 0 : 1
   name  = "${var.prefix}-manage-ca-certificates-kms"
 
   policy = data.aws_iam_policy_document.manage_ca_certificates_kms[count.index].json
@@ -87,7 +87,7 @@ resource "aws_iam_role_policy_attachment" "controller_certificate_mgmt_ssm" {
   policy_arn = aws_iam_policy.manage_ca_certificates_ssm.arn
 }
 resource "aws_iam_role_policy_attachment" "controller_certificate_mgmt_kms" {
-  count      = length(aws_iam_policy.manage_ca_certificates_kms) == 0 ? 0 : 1
+  count      = length(var.kms_key.ca_certs.key_id) == 0 ? 0 : 1
   role       = aws_iam_role.lambda_controller.name
   policy_arn = aws_iam_policy.manage_ca_certificates_kms[count.index].arn
 }
