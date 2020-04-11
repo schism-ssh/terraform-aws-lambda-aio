@@ -27,10 +27,7 @@ testing:
     - terraform apply tf.plan
     - echo -e "section_end:`date +%s`:terraform_apply\r\e[0K"
     - echo -e "section_start:`date +%s`:sleep_hell\r\e[0KSLEEPING IGNORE ME"
-    - sleep 30 # I hate this but testing if the timing plays a role here.
-    - sleep 30 # I hate this but testing if the timing plays a role here.
-    - sleep 30 # I hate this but testing if the timing plays a role here.
-    - sleep 30 # I hate this but testing if the timing plays a role here.
+    - sleep 50 # I hate this but it's useful randomly because IAM is sometimes slow
     - echo -e "section_end:`date +%s`:sleep_hell\r\e[0K"
     - echo -e "section_start:`date +%s`:lambda_testing\r\e[0KTesting Lambda Invocation"
     - aws lambda invoke --function "${TF_VAR_prefix}-controller" --log-type Tail --payload '{}' result.json
