@@ -31,7 +31,6 @@ variable "kms_key" {
 
 variable "ssm" {
   default = {
-    host_ca_param_name = "schism-host-ca-key"
-    user_ca_param_name = "schism-user-ca-key"
+    ca_param_prefix = "ca-key"
   }
 }
