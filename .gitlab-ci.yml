@@ -16,7 +16,7 @@ testing:
     - pip3 install awscli
     - echo -e "section_end:`date +%s`:package_installation\r\e[0K"
     - aws configure set region us-west-2
-    - export TF_VAR_prefix=$(pwgen -AB 8 1)
+    - export TF_VAR_prefix="${CI_COMMIT_REF_SLUG}-$(pwgen -AB 8 1)"
     - cd .ci
     - echo -e "section_start:`date +%s`:terraform_setup\r\e[0KTerraform Setup"
     - terraform init
