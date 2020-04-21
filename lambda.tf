@@ -17,9 +17,8 @@ resource "aws_lambda_function" "controller" {
 
   environment {
     variables = {
-      SCHISM_CA_KMS_KEY_ID      = var.kms_key.ca_certs.key_id
-      SCHISM_HOST_CA_PARAM_NAME = "${var.prefix}-${var.ssm.host_ca_param_name}"
-      SCHISM_USER_CA_PARAM_NAME = "${var.prefix}-${var.ssm.user_ca_param_name}"
+      SCHISM_CA_KMS_KEY_ID   = var.kms_key.ca_certs.key_id
+      SCHISM_CA_PARAM_PREFIX = "${var.prefix}-${var.ssm.ca_param_prefix}"
     }
   }
 }

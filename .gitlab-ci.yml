@@ -16,7 +16,7 @@ testing:
     - pip3 install awscli
     - echo -e "section_end:`date +%s`:package_installation\r\e[0K"
     - aws configure set region us-west-2
-    - export TF_VAR_prefix=$(pwgen -AB 8 1)
+    - export TF_VAR_prefix="${CI_COMMIT_REF_SLUG}-$(pwgen -AB 8 1)"
     - cd .ci
     - echo -e "section_start:`date +%s`:terraform_setup\r\e[0KTerraform Setup"
     - terraform init
@@ -26,9 +26,6 @@ testing:
     - echo -e "section_start:`date +%s`:terraform_apply\r\e[0KTerraform Apply"
     - terraform apply tf.plan
     - echo -e "section_end:`date +%s`:terraform_apply\r\e[0K"
-    - echo -e "section_start:`date +%s`:sleep_hell\r\e[0KSLEEPING IGNORE ME"
-    - sleep 50 # I hate this but it's useful randomly because IAM is sometimes slow
-    - echo -e "section_end:`date +%s`:sleep_hell\r\e[0K"
     - echo -e "section_start:`date +%s`:lambda_testing\r\e[0KTesting Lambda Invocation"
     - aws lambda invoke --function "${TF_VAR_prefix}-controller" --log-type Tail --payload '{}' result.json
     - jq . result.json

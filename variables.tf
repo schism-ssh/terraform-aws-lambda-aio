@@ -14,7 +14,7 @@ variable "lambda_function" {
   default = {
     controller = {
       name    = "controller"
-      version = "v0.2.2"
+      version = "v0.3.0"
       timeout = 900
       runtime = "go1.x"
     }
@@ -31,7 +31,6 @@ variable "kms_key" {
 
 variable "ssm" {
   default = {
-    host_ca_param_name = "schism-host-ca-key"
-    user_ca_param_name = "schism-user-ca-key"
+    ca_param_prefix = "ca-key"
   }
 }

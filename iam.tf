@@ -6,8 +6,7 @@ data "aws_iam_policy_document" "manage_ca_certificates_ssm" {
       "ssm:PutParameter"
     ]
     resources = [
-      "arn:aws:ssm:*:*:parameter/${var.prefix}-${var.ssm.host_ca_param_name}",
-      "arn:aws:ssm:*:*:parameter/${var.prefix}-${var.ssm.user_ca_param_name}"
+      "arn:aws:ssm:*:*:parameter/${var.prefix}-${var.ssm.ca_param_prefix}-*",
     ]
   }
 }
