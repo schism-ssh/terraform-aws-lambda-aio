@@ -11,29 +11,29 @@ stages:
 testing:
   stage: test
   before_script:
-    - echo -e "section_start:`date +%s`:package_installation\r\e[0KPackage Installaion"
+    - .ci/section_mark start package_installation "Package Installaion"
     - apk add -U pwgen python3 jq
     - pip3 install awscli
-    - echo -e "section_end:`date +%s`:package_installation\r\e[0K"
-    - echo -e "section_start:`date +%s`:terraform_setup\r\e[0KTerraform Setup"
+    - .ci/section_mark end package_installation
+    - .ci/section_mark start terraform_setup "Terraform Setup"
     - aws configure set region us-west-2
     - export TF_VAR_prefix="${CI_COMMIT_REF_SLUG}-$(pwgen -AB 8 1)"
     - cd .ci
     - terraform init
     - terraform plan -out tf.plan
-    - echo -e "section_end:`date +%s`:terraform_setup\r\e[0K"
+    - .ci/section_mark end terraform_setup
   script:
-    - echo -e "section_start:`date +%s`:terraform_apply\r\e[0KTerraform Apply"
+    - .ci/section_mark start terraform_apply "Terraform Apply"
     - terraform apply tf.plan
-    - echo -e "section_end:`date +%s`:terraform_apply\r\e[0K"
-    - echo -e "section_start:`date +%s`:lambda_testing\r\e[0KTesting Lambda Invocation"
+    - .ci/section_mark end terraform_apply
+    - .ci/section_mark start lambda_testing "Testing Lambda Invocation"
     - aws lambda invoke --function "${TF_VAR_prefix}-controller" --log-type Tail --payload '{}' result.json
     - jq . result.json
-    - echo -e "section_end:`date +%s`:lambda_testing\r\e[0K"
     - aws ssm describe-parameters --parameter-filters "Key=Name,Option=Contains,Values='${TF_VAR_prefix}-'"
-    - echo -e "section_start:`date +%s`:teardown\r\e[0KTearing Down Test Resources"
+    - .ci/section_mark end lambda_testing
+    - .ci/section_mark start teardown "Tearing Down Test Resources"
     - to_delete=$(aws ssm describe-parameters --parameter-filters "Key=Name,Option=Contains,Values='${TF_VAR_prefix}-'" --query "Parameters[*].Name" --output text)
     - aws ssm delete-parameters --names ${to_delete}
     - aws logs describe-log-groups --log-group-name-prefix "/aws/lambda/${TF_VAR_prefix}" | jq '.logGroups[].logGroupName' -r | xargs -I % aws logs delete-log-group --log-group-name %
     - terraform destroy -force
-    - echo -e "section_end:`date +%s`:teardown\r\e[0K"
+    - .ci/section_mark end teardown

@@ -1,0 +1,16 @@
+#!/usr/bin/env sh
+
+function sec_mark() {
+  local head_type=$1
+  local sec_name=$2
+  local sec_title="$3"
+
+  local message="section_${head_type}:`date +%s`:${sec_name}\r\e[0K"
+  if [[ "$head_type" == "start" ]]; then
+    message="${message}${sec_title}"
+  fi
+  echo  "$message"
+}
+
+
+sec_mark "$@"
