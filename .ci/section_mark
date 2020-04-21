@@ -5,11 +5,11 @@ function sec_mark() {
   local sec_name=$2
   local sec_title="$3"
 
-  local message="section_${head_type}:`date +%s`:${sec_name}\r\e[0K"
+  message="section_${head_type}:$(date +%s):${sec_name}\r\e[0K"
   if [[ "$head_type" == "start" ]]; then
     message="${message}${sec_title}"
   fi
-  echo  "$message"
+  echo -e "$message"
 }
 
 
