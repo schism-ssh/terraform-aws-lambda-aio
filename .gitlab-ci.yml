@@ -15,10 +15,10 @@ testing:
     - apk add -U pwgen python3 jq
     - pip3 install awscli
     - echo -e "section_end:`date +%s`:package_installation\r\e[0K"
+    - echo -e "section_start:`date +%s`:terraform_setup\r\e[0KTerraform Setup"
     - aws configure set region us-west-2
     - export TF_VAR_prefix="${CI_COMMIT_REF_SLUG}-$(pwgen -AB 8 1)"
     - cd .ci
-    - echo -e "section_start:`date +%s`:terraform_setup\r\e[0KTerraform Setup"
     - terraform init
     - terraform plan -out tf.plan
     - echo -e "section_end:`date +%s`:terraform_setup\r\e[0K"
@@ -34,5 +34,6 @@ testing:
     - echo -e "section_start:`date +%s`:teardown\r\e[0KTearing Down Test Resources"
     - to_delete=$(aws ssm describe-parameters --parameter-filters "Key=Name,Option=Contains,Values='${TF_VAR_prefix}-'" --query "Parameters[*].Name" --output text)
     - aws ssm delete-parameters --names ${to_delete}
+    - aws logs describe-log-groups --log-group-name-prefix "/aws/lambda/${TF_VAR_prefix}" | jq '.logGroups[].logGroupName' -r | xargs -I % aws logs delete-log-group --log-group-name %
     - terraform destroy -force
     - echo -e "section_end:`date +%s`:teardown\r\e[0K"
