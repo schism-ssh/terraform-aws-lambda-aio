@@ -16,7 +16,7 @@ testing:
   before_script:
     - ${section_mark} start package_installation "Package Installaion"
     - apk add -U pwgen python3 jq
-    - pip3 install awscli
+    - pip3 install awscli boto3
     - ${section_mark} end package_installation
     - ${section_mark} start terraform_setup "Terraform Setup"
     - aws configure set region us-west-2
